@@ -1,2 +1,3 @@
-# Developing_Data_Products
-Material to be used in the Developing Data Products Course
+# Developing Data Products
+Final project of Coursera's Developing Data Products Course
+
