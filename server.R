@@ -8,7 +8,7 @@ library(gridExtra)
 
 
 # loading the data
-dataMS <- read.csv("~/Cursos/Data Science/09 Developing Data Products/Projeto/Data/tabMinorStoppages.csv", header = TRUE)
+dataMS <- read.csv("~/Data/tabMinorStoppages.csv", header = TRUE)
 dataMS$fail_date <- as.POSIXct(dataMS$fail_date, origin = "1970-01-01", tz = "UTC")
 dataMS <- subset(dataMS, stopDur <= 600)
 
