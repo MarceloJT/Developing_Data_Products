@@ -8,77 +8,76 @@ library(gridExtra)
 
 
 # loading the data
-dataMS <- read.csv("~/Data/tabMinorStoppages.csv", header = TRUE)
+dataMS <- read.csv("tabMinorStoppages.csv", header = TRUE)
 dataMS$fail_date <- as.POSIXct(dataMS$fail_date, origin = "1970-01-01", tz = "UTC")
 dataMS <- subset(dataMS, stopDur <= 600)
-
 
 shinyServer(  
         function(input, output) {   
                 
                 # prepares the dataset for multiple usage
                 dataSubSet <- reactive({
-                   dataA <- as.POSIXct(input$dateRange[1])
-                   dateB <- as.POSIXct(input$dateRange[2])
-                   lineSel <- input$lineSel
-                   ShiftSel <- input$ShiftSel
-                   minDur <- 5
-                   maxDur <- 600
-                   dataSubSet <- subset(dataMS, (fail_date >= dataA & fail_date <= dateB))
-                   dataSubSet <- subset(dataSubSet, (line == lineSel & Shift == ShiftSel))
+                        dataA <- as.POSIXct(input$dateRange[1])
+                        dateB <- as.POSIXct(input$dateRange[2])
+                        lineSel <- input$lineSel
+                        ShiftSel <- input$ShiftSel
+                        minDur <- 5
+                        maxDur <- 600
+                        dataSubSet <- subset(dataMS, (fail_date >= dataA & fail_date <= dateB))
+                        dataSubSet <- subset(dataSubSet, (line == lineSel & Shift == ShiftSel))
                 })
                 
-### Weibull Distribution
+                ### Weibull Distribution
                 
                 # prepares MTBF for multiple usage
                 mean_tbf <- reactive({
-                   mean_tbf   <- mean(dataSubSet()$tbf)
+                        mean_tbf   <- mean(dataSubSet()$tbf)
                 })
                 
                 # prepares Weibull Fitting for multiple usage
                 fitWeibull <- reactive({
-                   fitWeibull <- fitdist(dataSubSet()$tbf, "weibull", start = c(shape=1, scale=mean_tbf()))
+                        fitWeibull <- fitdist(dataSubSet()$tbf, "weibull", start = c(shape=1, scale=mean_tbf()))
                 })
                 
                 
                 # prepares Weibull Test for multiple usage
                 testWeib <- reactive({
-                   testWeib <- ks.test(dataSubSet()$tbf, "pweibull",shape=fitWeibull()$estimate[1], scale=fitWeibull()$estimate[2])
+                        testWeib <- ks.test(dataSubSet()$tbf, "pweibull",shape=fitWeibull()$estimate[1], scale=fitWeibull()$estimate[2])
                 })
                 
                 # time series of MS TBF (tbf)
                 output$lineGraphTBF <- renderPlot({
                         ggplot(data = dataSubSet(), aes(x=fail_date)) +
-                        geom_line(aes(y=tbf)) +
-                        geom_hline(yintercept = mean_tbf(), colour = "red", size = 1) +     
-                        ggtitle(expression(atop("Time Between Minor Stoppages",
-                                           atop(italic("in minutes"),"")))) +
-                        xlab("Date") + ylab("TBF (in minutes)")  }) 
+                                geom_line(aes(y=tbf)) +
+                                geom_hline(yintercept = mean_tbf(), colour = "red", size = 1) +     
+                                ggtitle(expression(atop("Time Between Minor Stoppages",
+                                                        atop(italic("in minutes"),"")))) +
+                                xlab("Date") + ylab("TBF (in minutes)")  }) 
                 
                 # histogram of MS TBF (tbf)
                 output$histWeibull <- renderPlot({
-                           ggplot(data=dataSubSet(), aes(x=tbf)) +
-                           geom_histogram(aes(y=..density..), binwidth = 5, 
-                                          colour="#999999",fill="#000099") +
-                           geom_vline(xintercept = fitWeibull()$estimate[2], colour = "red", size=1) +
-                           ggtitle(expression(atop("Time Between Minor Stoppages",
-                                              atop(italic("in minutes"),"")))) +
-                           xlab("TBF (min)") + ylab("density") +
-                           scale_x_continuous(limits = c(0, input$graphRangeA))  }) 
+                        ggplot(data=dataSubSet(), aes(x=tbf)) +
+                                geom_histogram(aes(y=..density..), binwidth = 5, 
+                                               colour="#999999",fill="#000099") +
+                                geom_vline(xintercept = fitWeibull()$estimate[2], colour = "red", size=1) +
+                                ggtitle(expression(atop("Time Between Minor Stoppages",
+                                                        atop(italic("in minutes"),"")))) +
+                                xlab("TBF (min)") + ylab("density") +
+                                scale_x_continuous(limits = c(0, input$graphRangeA))  }) 
                 
                 
                 # graph of Weibull Fitting of MS TBF (tbf)
                 output$functWeibull <- renderPlot({
-                           ggplot(data=dataSubSet(), aes(x=tbf)) +
-                           geom_density(aes(y=..density..), size=.5, colour= "blue") +
-                           geom_vline(xintercept = fitWeibull()$estimate[2], colour = "red", size=1) +
-                           stat_function(fun=dweibull, geom="line", size=.5, colour="red",
-                                         args = list(shape=fitWeibull()$estimate[1], 
-                                                     scale=fitWeibull()$estimate[2])) +
-                           ggtitle(expression(atop("Weibull Distribution Fitting",
-                                              atop(italic("in minutes"),"")))) +
-                           xlab("TBF (min)") + ylab("density") +
-                           scale_x_continuous(limits = c(0, input$graphRangeB))  }) 
+                        ggplot(data=dataSubSet(), aes(x=tbf)) +
+                                geom_density(aes(y=..density..), size=.5, colour= "blue") +
+                                geom_vline(xintercept = fitWeibull()$estimate[2], colour = "red", size=1) +
+                                stat_function(fun=dweibull, geom="line", size=.5, colour="red",
+                                              args = list(shape=fitWeibull()$estimate[1], 
+                                                          scale=fitWeibull()$estimate[2])) +
+                                ggtitle(expression(atop("Weibull Distribution Fitting",
+                                                        atop(italic("in minutes"),"")))) +
+                                xlab("TBF (min)") + ylab("density") +
+                                scale_x_continuous(limits = c(0, input$graphRangeB))  }) 
                 
                 
                 # table with Weibull Outputs
@@ -86,7 +85,7 @@ shinyServer(
                         WeibullTable <- cbind(fitWeibull()$estimate,fitWeibull()$sd)
                         colnames(WeibullTable) <- c("Value","SE")
                         as.table(WeibullTable)  })
-                        
+                
                 # table with Weibull Fitting Outputs
                 output$WeibullFit <- renderTable({
                         WeibullFit <- rbind(testWeib()$statistic,testWeib()$p.value,testWeib()$alternative,testWeib()$method)
@@ -101,8 +100,8 @@ shinyServer(
                         cdfcomp(fitWeibull())
                         qqcomp(fitWeibull())
                         ppcomp(fitWeibull())  })
-
-### Lognormal Distribution                
+                
+                ### Lognormal Distribution                
                 
                 # prepares meanLogDur for multiple usage
                 meanLogDur <- reactive({
@@ -137,7 +136,7 @@ shinyServer(
                 
                 # histogram of MS Duration (stopDur)
                 output$histLogNorm <- renderPlot({
-                                ggplot(data=dataSubSet(), aes(x=stopDur)) +
+                        ggplot(data=dataSubSet(), aes(x=stopDur)) +
                                 geom_histogram(aes(y=..density..), binwidth = 5, 
                                                colour="#999999",fill="#000099") +
                                 geom_vline(xintercept = exp(fitLogNorm()$estimate[1]), colour = "red", size=1) +
@@ -187,5 +186,5 @@ shinyServer(
                 
                 
                 
-                }
+        }
 )

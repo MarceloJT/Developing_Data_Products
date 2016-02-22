@@ -1,11 +1,7 @@
-# Shiny App Project   
-#
-# Marcelo Tardelli  -  February 2016
-# 
-# Minor Stoppages Analysis
-#
-
 library(shiny)
+library(rmarkdown)
+
+
 
 shinyUI(pageWithSidebar(
         
@@ -33,7 +29,7 @@ shinyUI(pageWithSidebar(
                 tabsetPanel( 
                         
                         tabPanel("Overview", 
-                                 includeMarkdown("Overview.md")
+                                 includeMarkdown("overview.md")
                         ),
                         
                         
@@ -63,9 +59,9 @@ shinyUI(pageWithSidebar(
                                  
                                  plotOutput("WeibProb")
                                  
-                                 ),
-                
-               
+                        ),
+                        
+                        
                         tabPanel("Minor Stoppages Duration", 
                                  h4("Data Series - Minor Stoppages Duration"),
                                  plotOutput("lineGraphMS"),
