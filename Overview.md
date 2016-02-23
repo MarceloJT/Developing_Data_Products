@@ -12,7 +12,7 @@ A **Minor Stoppage** is an operational stoppage of the machine / line that :
 * no spare parts are exchanged to restore the machine functioning;
 * have direct impact on machine's **OEE** (Overall Equipment Effectiveness) and reduces significantly the line throughput.  
 
-A deep understanding on the behavior of such stoppages can drive more effective action plans to either reduce them or eliminate them from the process.  In the same way, it allows *process simulation* processes through specific software, that demands good understanding on the statistical distribution parameters of the minor stoppages events.
+A deep understanding on the behavior of such stoppages can drive more effective action plans to either reduce them or eliminate them from the process.  In the same way, it allows *process simulation* processes through specific software, that demands good understanding on the statistical distribution parameters of those minor stoppages events.
 <BR>
 
 ## Premises
@@ -31,6 +31,7 @@ To get the minor stoppages analysed, in the main panel of the app you just have 
 * define the packging line to be studied;
 * define the operation shift of interest.  
 As the input data changes, the graphs and parameters automatically change too.
+* x axis range can be changed as well.
 <BR>
 
 ## Results
@@ -39,7 +40,7 @@ As direct results of the analysis, you will obtain :
 1. In the "Time Between Minor Stoppages" tab :
      + A time series graph of the selected data;
      + An histogram of the data, with the Mean Time Between Stoppages plotted;
-     + A graph with the theoretical and the Weibull plots;
+     + A graph with the real and the theoretical the Weibull plots;
      + The Weibull distribution parameters and the regression data in their specific tables;
      + The Weibull distribution plots.  
 
@@ -47,7 +48,7 @@ As direct results of the analysis, you will obtain :
 2. In the "Minor Stoppages Duration" tab :
      + A time series graph of the selected data;
      + An histogram of the data, with the Mean Stoppage Time plotted;
-     + A graph with the theoretical and the Lognormal plots;
+     + A graph with the real and the theoretical Lognormal plots;
      + The Lognormal distribution parameters and the regression data in their specific tables;
      + The Lognormal distribution plots.
 
